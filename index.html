@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code File Uploader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .file-container {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input.title-input {
+            margin-bottom: 10px;
+            padding: 5px;
+            width: calc(100% - 12px);
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Code File Uploader</h1>
+    <input type="file" id="fileInput" multiple accept=".txt,.py,.js,.java,.html,.css" />
+    <button id="addMoreFiles">Add More Files</button>
+    <div id="fileDisplayArea"></div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileDisplayArea = document.getElementById('fileDisplayArea');
+        const addMoreFilesButton = document.getElementById('addMoreFiles');
+
+        function handleFileUpload(files) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const fileContainer = document.createElement('div');
+                    fileContainer.classList.add('file-container');
+
+                    const titleInput = document.createElement('input');
+                    titleInput.type = 'text';
+                    titleInput.className = 'title-input';
+                    titleInput.placeholder = 'Enter title for this code snippet';
+
+                    const pre = document.createElement('pre');
+                    pre.textContent = e.target.result;
+
+                    const button = document.createElement('button');
+                    button.textContent = 'Copy Code';
+                    button.addEventListener('click', function () {
+                        navigator.clipboard.writeText(pre.textContent).then(() => {
+                            alert('Code copied to clipboard!');
+                        }).catch(err => {
+                            console.error('Could not copy text: ', err);
+                        });
+                    });
+
+                    fileContainer.appendChild(titleInput);
+                    fileContainer.appendChild(pre);
+                    fileContainer.appendChild(button);
+                    fileDisplayArea.appendChild(fileContainer);
+                };
+
+                reader.readAsText(file);
+            });
+        }
+
+        fileInput.addEventListener('change', function () {
+            handleFileUpload(fileInput.files);
+        });
+
+        addMoreFilesButton.addEventListener('click', function () {
+            const newFileInput = document.createElement('input');
+            newFileInput.type = 'file';
+            newFileInput.multiple = true;
+            newFileInput.accept = '.txt,.py,.js,.java,.html,.css';
+            newFileInput.style.display = 'none';
+            document.body.appendChild(newFileInput);
+
+            newFileInput.addEventListener('change', function () {
+                handleFileUpload(newFileInput.files);
+                document.body.removeChild(newFileInput);
+            });
+
+            newFileInput.click();
+        });
+    </script>
+</body>
+</html>
